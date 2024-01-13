@@ -27,3 +27,13 @@ export type Geo = {
   lat: string;
   lng: string;
 };
+
+export type FieldOption = {
+  label: "Name" | "Company" | "Email";
+  value: "name" | "company.name" | "email";
+};
+
+export type DirectionOption = {
+  label: "Ascending" | "Descending";
+  value: "ascending" | "descending";
+};

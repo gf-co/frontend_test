@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import Avatar from "boring-avatars";
 import {
   FaRegCircleXmark,
@@ -12,7 +12,10 @@ import {
 import Controls from "./controls";
 import Modal from "./modal";
 
-import { User } from "./types/user";
+import { DirectionOption, FieldOption, User } from "./types/user";
+import { ActionMeta, SingleValue } from "react-select";
+
+import get from 'lodash/get';
 
 export type GalleryProps = {
   users: User[];
@@ -21,6 +24,8 @@ const Gallery = ({ users }: GalleryProps) => {
   const [usersList, setUsersList] = useState(users);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [sortField, setSortField] = useState<FieldOption>({ label: "Name", value: "name"});
+  const [sortDirection, setSortDirection] = useState<DirectionOption>({ label: "Ascending", value: "ascending" });
 
   const handleModalOpen = (id: number) => {
     const user = usersList.find((item) => item.id === id) || null;
@@ -36,14 +41,46 @@ const Gallery = ({ users }: GalleryProps) => {
     setIsModalOpen(false);
   };
 
+  const handleChangeField = useCallback((newValue: SingleValue<FieldOption>, actionMeta: ActionMeta<FieldOption>) => {
+    if (newValue !== null) {
+      setSortField(newValue);
+    }
+  }, []);
+
+  const handleChangeDirection = useCallback((newValue: SingleValue<DirectionOption>, actionMeta: ActionMeta<DirectionOption>) => {
+    if (newValue !== null) {
+      setSortDirection(newValue);
+    }
+  }, []);
+
+  const sortedUsersList = useMemo(() => {
+    return [...usersList].sort((a, b) => {
+      let aValue = get(a, sortField.value);
+      let bValue = get(b, sortField.value);
+
+      if (aValue < bValue) {
+        return sortDirection.value === "ascending" ? -1 : 1;
+      }
+      if (aValue > bValue) {
+        return sortDirection.value === "ascending" ? 1 : -1;
+      }
+      return 0;
+    });
+  }, [usersList, sortField, sortDirection]);
+
   return (
     <div className="user-gallery">
       <div className="heading">
         <h1 className="title">Users</h1>
-        <Controls />
+        <Controls
+          sortField={sortField}
+          sortDirection={sortDirection}
+          handleChangeField={handleChangeField}
+          handleChangeDirection={handleChangeDirection}
+        />
       </div>
       <div className="items">
-        {usersList.map((user, index) => (
+        {sortedUsersList.map((user, index) => (
           <div
             className="item user-card"
             key={index}
