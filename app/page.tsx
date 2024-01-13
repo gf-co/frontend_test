@@ -66,7 +66,7 @@ async function getUsers(): Promise<User[]> {
           content: USERS_GPT_PROMPT.message
         },
       ],
-      response_format: { "type": "json_object" },
+      response_format: USERS_GPT_PROMPT.response_format,
       stream: false,
     }),
   });
