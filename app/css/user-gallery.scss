@@ -7,8 +7,15 @@
     grid-template-rows: auto;
     grid-gap: 16px;
 
-    @media screen and (max-width: 480px) {
+    /* The same media query values from app/page.module.css */
+    /* Mobile */
+    @media (max-width: 700px) {
       grid-template-columns: 1fr;
+    }
+
+    /* Tablet and Smaller Desktop */
+    @media (min-width: 701px) and (max-width: 1120px) {
+      grid-template-columns: 1fr 1fr;
     }
   }
 
